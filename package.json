@@ -1,0 +1,20 @@
+{
+  "name": "serverless-sam-plugin",
+  "version": "1.0.0",
+  "description": "Plugin to make Serverless work with Function Hub",
+  "main": "index.js",
+  "dependencies": {
+    "@backand/nodejs-sdk": "^1.2.8",
+    "async": "^2.5.0",
+    "joi": "^10.6.0",
+    "js-yaml": "^3.9.0",
+    "lodash": "^4.17.4",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yoram Kornatzky",
+  "license": "ISC"
+}
