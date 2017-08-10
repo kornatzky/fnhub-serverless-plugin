@@ -1,6 +1,6 @@
 {
   "name": "funhub-serverless-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Plugin to make Serverless work with fnhub",
   "main": "index.js",
   "dependencies": {
