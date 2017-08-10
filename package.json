@@ -1,5 +1,5 @@
 {
-  "name": "funhub-serverless-plugin",
+  "name": "fnhub-serverless-plugin",
   "version": "1.0.1",
   "description": "Plugin to make Serverless work with fnhub",
   "main": "index.js",
