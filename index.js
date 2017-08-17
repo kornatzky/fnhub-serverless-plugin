@@ -2,17 +2,17 @@
 
 var Joi = require('joi');
 var request = require('request');
-var Joi = require('joi');
-var info =  require('./info');
 var yaml = require('js-yaml');
 var backand = require('@backand/nodejs-sdk');
 var _ = require('lodash');
 var fs = require('fs');
 var util = require('util');
-var config = require('./config');
 var path = require('path');
 var http = require('http');
 var async = require('async');
+
+var config = require('./config');
+var info =  require('./info');
 
 class ServerlessPlugin {
   constructor(serverless, options) {
@@ -39,7 +39,7 @@ class ServerlessPlugin {
 
     this.hooks = {
       'include:extract': this.extractFunctionSpec.bind(this),
-      'before:package:cleanup': this.cleanup.bind(this)
+      // 'before:package:cleanup': this.cleanup.bind(this)
     };
   }
 
@@ -95,9 +95,14 @@ class ServerlessPlugin {
                   else{
                     // add to serverless.yml custom section
                     var functionName = moduleName + '-' + key;
-                    doc.custom.fnhub[functionName] = {  handler: value.Properties.Handler, module: moduleName };
+                    doc.functions.functionName = _.assign(doc.functions.functionName || {}, {  
+                      handler: value.Properties.Handler, 
+                      package: {
+                        artifact: '.fnhub/' + moduleName + '.zip'
+                      }
+                    };
                     if (value.Properties.Environment && value.Properties.Environment.Variables){
-                      doc.custom.fnhub[functionName]['environment'] = value.Properties.Environment.Variables;
+                      doc.functions.functionName['environment'] = value.Properties.Environment.Variables;
                     }
 
                     
