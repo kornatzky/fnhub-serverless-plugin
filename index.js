@@ -39,7 +39,6 @@ class ServerlessPlugin {
 
     this.hooks = {
       'include:extract': this.extractFunctionSpec.bind(this),
-      'before:package:cleanup': this.cleanup.bind(this)
     };
   }
 
@@ -63,11 +62,6 @@ class ServerlessPlugin {
           // read serverless.yml file          
           try {
             var doc = yaml.safeLoad(fs.readFileSync(config.serverlessFileName, 'utf8'));
-            if (!doc.custom)
-              doc.custom = {};
-            if (!doc.custom.fnhub){
-              doc.custom.fnhub = {};
-            }
           } 
           catch (e) {
             that.serverless.cli.log('The ' + config.serverlessFileName + ' file is damaged, cannot proceed, aborting!');
@@ -84,8 +78,10 @@ class ServerlessPlugin {
             function(callbackWaterfall) {
               async.each(_.toPairs(moduleSpec.Resources), 
                 function(functionSpec, callback) {
+
                   var key = functionSpec[0];
                   var value = functionSpec[1];
+
               
                   // check runtimes match
                   if (value.Properties.Runtime != runtime){
@@ -95,9 +91,19 @@ class ServerlessPlugin {
                   else{
                     // add to serverless.yml custom section
                     var functionName = moduleName + '-' + key;
-                    doc.custom.fnhub[functionName] = {  handler: value.Properties.Handler, module: moduleName };
+                    if (!doc.functions){
+                      doc.functions = {};
+                    }
+
+                    doc.functions[functionName] = {  
+                      handler: value.Properties.Handler, 
+                      package: {
+                        artifact: '.fnhub/' + moduleName + '.zip'
+                      }
+                    };
+
                     if (value.Properties.Environment && value.Properties.Environment.Variables){
-                      doc.custom.fnhub[functionName]['environment'] = value.Properties.Environment.Variables;
+                      doc.functions[functionName]['Environment'] = { Variables: value.Properties.Environment.Variables };
                     }
 
                     
@@ -174,20 +180,6 @@ class ServerlessPlugin {
     });  
   }
 
-  cleanup() {
-    this.serverless.service.package = { individually: true };
-    var that = this;
-    var functionData = _.fromPairs(_.map(this.serverless.service.custom.fnhub, function(value, key){
-      return [key, {
-        handler: value.handler,
-        environment: value.environment,
-        events: [],
-        name: that.serverless.service.service + "-" + (that.serverless.processedInput.options.stage || that.serverless.service.provider.stage || 'dev') + "-" + key,
-        package: { artifact: path.join(process.cwd(), config.fnhubFolder,  value.module + '.zip' ) }
-      }];
-    }));
-    this.serverless.service.functions = _.merge(this.serverless.service.functions || {}, functionData);
-  }
 
 
 
