@@ -13,6 +13,7 @@ var config = require('./config');
 var path = require('path');
 var http = require('http');
 var async = require('async');
+var ProgressBar = require('ascii-progress');
 
 class ServerlessPlugin {
   constructor(serverless, options) {
@@ -69,6 +70,7 @@ class ServerlessPlugin {
           }
 
 
+          that.serverless.cli.log('We are adding the functions from the module to your serverless configuration');
           
           
           var runtime = that.serverless.service.provider.runtime;
@@ -170,6 +172,24 @@ class ServerlessPlugin {
       if (response.statusCode === 200) {
         var file = fs.createWriteStream(path);
         var res = response.pipe(file);
+
+
+        var len = parseInt(response.headers['content-length'], 10);
+
+        var cur = 0;
+
+        var bar = new ProgressBar({ 
+            schema: ':bar.red :percent.green',
+            total : 100
+        });
+
+        response.on("data", function(chunk) {
+           
+            cur += chunk.length;
+            bar.tick();
+        });
+
+
         res.on('finish', function(){
           callback(null);
         })

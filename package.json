@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "@backand/nodejs-sdk": "^1.2.8",
+    "ascii-progress": "^1.0.5",
     "async": "^2.5.0",
     "joi": "^10.6.0",
     "js-yaml": "^3.9.0",
